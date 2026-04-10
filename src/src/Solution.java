@@ -2,106 +2,111 @@ import java.util.*;
 
 public class Solution {
 
-    // ---------------- Linear Search ----------------
-    public static void linearSearch(String[] logs, String target) {
-        int first = -1, last = -1;
-        int comparisons = 0;
+    // ---------------- Client Class ----------------
+    static class Client {
+        String name;
+        int riskScore;
+        double accountBalance;
 
-        for (int i = 0; i < logs.length; i++) {
-            comparisons++;
-            if (logs[i].equals(target)) {
-                if (first == -1) first = i;
-                last = i;
-            }
+        Client(String name, int riskScore, double accountBalance) {
+            this.name = name;
+            this.riskScore = riskScore;
+            this.accountBalance = accountBalance;
         }
 
-        System.out.println("Linear Search:");
-        if (first != -1) {
-            System.out.println("First occurrence at index: " + first);
-            System.out.println("Last occurrence at index: " + last);
-        } else {
-            System.out.println("Account not found");
+        public String toString() {
+            return name + " : Risk=" + riskScore + ", Balance=" + accountBalance;
         }
-        System.out.println("Comparisons: " + comparisons);
     }
 
-    // ---------------- Binary Search ----------------
-    public static void binarySearch(String[] logs, String target) {
-        int low = 0, high = logs.length - 1;
-        int comparisons = 0;
-        int index = -1;
+    // ---------------- Bubble Sort ----------------
+    // Sort ascending by risk score and visualize swaps
+    public static void bubbleSortAscending(Client[] arr) {
+        int n = arr.length;
+        int swaps = 0;
 
-        while (low <= high) {
-            int mid = (low + high) / 2;
-            comparisons++;
+        for (int i = 0; i < n - 1; i++) {
+            boolean swapped = false;
 
-            int cmp = logs[mid].compareTo(target);
+            for (int j = 0; j < n - i - 1; j++) {
+                if (arr[j].riskScore > arr[j + 1].riskScore) {
 
-            if (cmp == 0) {
-                index = mid;
-                break;
-            } else if (cmp < 0) {
-                low = mid + 1;
-            } else {
-                high = mid - 1;
+                    // visualize swap
+                    System.out.println("Swapping " + arr[j].name + " and " + arr[j + 1].name);
+
+                    Client temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+
+                    swaps++;
+                    swapped = true;
+                }
             }
+
+            if (!swapped) break;
         }
 
-        System.out.println("\nBinary Search:");
-
-        if (index == -1) {
-            System.out.println("Account not found");
-            System.out.println("Comparisons: " + comparisons);
-            return;
-        }
-
-        // Count occurrences (expand left and right)
-        int count = 1;
-        int left = index - 1;
-        int right = index + 1;
-
-        while (left >= 0 && logs[left].equals(target)) {
-            comparisons++;
-            count++;
-            left--;
-        }
-
-        while (right < logs.length && logs[right].equals(target)) {
-            comparisons++;
-            count++;
-            right++;
-        }
-
-        System.out.println("One occurrence at index: " + index);
-        System.out.println("Total occurrences: " + count);
-        System.out.println("Comparisons: " + comparisons);
+        System.out.println("Total swaps: " + swaps);
     }
 
-    // ---------------- Utility Print ----------------
-    public static void printArray(String[] arr) {
-        for (String s : arr)
-            System.out.print(s + " ");
-        System.out.println();
+    // ---------------- Insertion Sort ----------------
+    // Sort by riskScore DESC, if equal then by accountBalance DESC
+    public static void insertionSortDescending(Client[] arr) {
+
+        for (int i = 1; i < arr.length; i++) {
+            Client key = arr[i];
+            int j = i - 1;
+
+            while (j >= 0 &&
+                    (arr[j].riskScore < key.riskScore ||
+                            (arr[j].riskScore == key.riskScore &&
+                                    arr[j].accountBalance < key.accountBalance))) {
+
+                arr[j + 1] = arr[j];
+                j--;
+            }
+
+            arr[j + 1] = key;
+        }
+    }
+
+    // ---------------- Print Utility ----------------
+    public static void printArray(Client[] arr) {
+        for (Client c : arr)
+            System.out.println(c);
+    }
+
+    // ---------------- Top Risk Clients ----------------
+    public static void printTopRisk(Client[] arr, int k) {
+        System.out.println("\nTop " + k + " Highest Risk Clients:");
+        for (int i = 0; i < Math.min(k, arr.length); i++) {
+            System.out.println(arr[i]);
+        }
     }
 
     // ---------------- Main Method ----------------
     public static void main(String[] args) {
 
-        String[] logs = {"accB", "accA", "accB", "accC"};
+        Client[] clients = {
+                new Client("clientC", 80, 20000),
+                new Client("clientA", 20, 5000),
+                new Client("clientB", 50, 12000)
+        };
 
-        System.out.println("Original Logs:");
-        printArray(logs);
+        System.out.println("Original Data:");
+        printArray(clients);
 
-        // Linear search on unsorted data
-        linearSearch(logs, "accB");
+        // ---------------- Bubble Sort Demo ----------------
+        System.out.println("\nBubble Sort (Ascending Risk):");
+        bubbleSortAscending(clients);
+        printArray(clients);
 
-        // Sort logs for binary search
-        Arrays.sort(logs);
+        // ---------------- Insertion Sort Ranking ----------------
+        System.out.println("\nInsertion Sort (Descending Risk + Balance):");
+        insertionSortDescending(clients);
+        printArray(clients);
 
-        System.out.println("\nSorted Logs:");
-        printArray(logs);
-
-        // Binary search on sorted data
-        binarySearch(logs, "accB");
+        // ---------------- Top Risk ----------------
+        printTopRisk(clients, 10);
     }
 }
