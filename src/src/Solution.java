@@ -2,185 +2,96 @@ import java.util.*;
 
 public class Solution {
 
-    // ---------------- Trade Class ----------------
-    static class Trade {
-        String id;
-        int volume;
+    // ---------------- Linear Search ----------------
+    public static void linearSearch(int[] arr, int target) {
+        int comparisons = 0;
+        boolean found = false;
 
-        Trade(String id, int volume) {
-            this.id = id;
-            this.volume = volume;
-        }
-
-        public String toString() {
-            return id + " : " + volume;
-        }
-    }
-
-    // =========================================================
-    // ---------------- Merge Sort (Ascending) -----------------
-    // Stable O(n log n)
-    // =========================================================
-    public static void mergeSort(Trade[] arr, int left, int right) {
-        if (left < right) {
-            int mid = (left + right) / 2;
-
-            mergeSort(arr, left, mid);
-            mergeSort(arr, mid + 1, right);
-
-            merge(arr, left, mid, right);
-        }
-    }
-
-    private static void merge(Trade[] arr, int left, int mid, int right) {
-
-        int n1 = mid - left + 1;
-        int n2 = right - mid;
-
-        Trade[] L = new Trade[n1];
-        Trade[] R = new Trade[n2];
-
-        for (int i = 0; i < n1; i++)
-            L[i] = arr[left + i];
-        for (int j = 0; j < n2; j++)
-            R[j] = arr[mid + 1 + j];
-
-        int i = 0, j = 0, k = left;
-
-        while (i < n1 && j < n2) {
-            if (L[i].volume <= R[j].volume) { // stable
-                arr[k++] = L[i++];
-            } else {
-                arr[k++] = R[j++];
+        for (int i = 0; i < arr.length; i++) {
+            comparisons++;
+            if (arr[i] == target) {
+                System.out.println("Linear Search: Found at index " + i);
+                found = true;
+                break;
             }
         }
 
-        while (i < n1)
-            arr[k++] = L[i++];
+        if (!found)
+            System.out.println("Linear Search: Threshold not found");
 
-        while (j < n2)
-            arr[k++] = R[j++];
+        System.out.println("Comparisons: " + comparisons);
     }
 
-    // =========================================================
-    // ---------------- Quick Sort (Descending) ----------------
-    // In-place, Lomuto partition
-    // =========================================================
-    public static void quickSort(Trade[] arr, int low, int high) {
-        if (low < high) {
-            int pi = partition(arr, low, high);
-            quickSort(arr, low, pi - 1);
-            quickSort(arr, pi + 1, high);
-        }
-    }
+    // ---------------- Binary Search: Floor & Ceiling ----------------
+    public static void binaryFloorCeiling(int[] arr, int target) {
+        int low = 0, high = arr.length - 1;
+        int floor = -1, ceiling = -1;
+        int comparisons = 0;
 
-    private static int partition(Trade[] arr, int low, int high) {
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            comparisons++;
 
-        Trade pivot = arr[high]; // last element pivot
-        int i = low - 1;
-
-        for (int j = low; j < high; j++) {
-            if (arr[j].volume >= pivot.volume) { // descending
-                i++;
-                swap(arr, i, j);
+            if (arr[mid] == target) {
+                floor = ceiling = arr[mid];
+                break;
+            }
+            else if (arr[mid] < target) {
+                floor = arr[mid];
+                low = mid + 1;
+            }
+            else {
+                ceiling = arr[mid];
+                high = mid - 1;
             }
         }
 
-        swap(arr, i + 1, high);
-        return i + 1;
+        System.out.println("\nBinary Search:");
+        System.out.println("Floor value: " + (floor == -1 ? "None" : floor));
+        System.out.println("Ceiling value: " + (ceiling == -1 ? "None" : ceiling));
+        System.out.println("Comparisons: " + comparisons);
     }
 
-    private static void swap(Trade[] arr, int i, int j) {
-        Trade temp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = temp;
-    }
+    // ---------------- Binary Search: Insertion Point ----------------
+    public static void findInsertionPoint(int[] arr, int target) {
+        int low = 0, high = arr.length;
+        int comparisons = 0;
 
-    // =========================================================
-    // ---------------- Merge Two Sorted Lists -----------------
-    // Both arrays must be sorted ascending
-    // =========================================================
-    public static Trade[] mergeTwoSorted(Trade[] a, Trade[] b) {
+        while (low < high) {
+            int mid = (low + high) / 2;
+            comparisons++;
 
-        Trade[] result = new Trade[a.length + b.length];
-
-        int i = 0, j = 0, k = 0;
-
-        while (i < a.length && j < b.length) {
-            if (a[i].volume <= b[j].volume)
-                result[k++] = a[i++];
+            if (arr[mid] < target)
+                low = mid + 1;
             else
-                result[k++] = b[j++];
+                high = mid;
         }
 
-        while (i < a.length)
-            result[k++] = a[i++];
-
-        while (j < b.length)
-            result[k++] = b[j++];
-
-        return result;
+        System.out.println("Insertion point for " + target + " is index: " + low);
+        System.out.println("Comparisons: " + comparisons);
     }
 
-    // =========================================================
-    // ---------------- Total Volume ---------------------------
-    // =========================================================
-    public static int totalVolume(Trade[] arr) {
-        int sum = 0;
-        for (Trade t : arr)
-            sum += t.volume;
-        return sum;
+    // ---------------- Utility Print ----------------
+    public static void printArray(int[] arr) {
+        System.out.println(Arrays.toString(arr));
     }
 
-    // =========================================================
-    // ---------------- Utility Print --------------------------
-    // =========================================================
-    public static void printArray(Trade[] arr) {
-        for (Trade t : arr)
-            System.out.println(t);
-    }
-
-    // =========================================================
-    // ---------------- Main Method ----------------------------
-    // =========================================================
+    // ---------------- Main Method ----------------
     public static void main(String[] args) {
 
-        Trade[] trades = {
-                new Trade("trade3  ", 500),
-                new Trade("trade1"  , 100),
-                new Trade("trade2", 300)
-        };
+        int[] risks = {10, 25, 50, 100};
+        int threshold = 30;
 
-        System.out.println("Original Trades:");
-        printArray(trades);
+        System.out.println("Sorted Risk Bands:");
+        printArray(risks);
 
-        // ---------------- Merge Sort ----------------
-        mergeSort(trades, 0, trades.length - 1);
-        System.out.println("\nAfter Merge Sort (Ascending):");
-        printArray(trades);
+        // Linear search (works on unsorted too)
+        linearSearch(risks, threshold);
 
-        // ---------------- Quick Sort ----------------
-        quickSort(trades, 0, trades.length - 1);
-        System.out.println("\nAfter Quick Sort (Descending):");
-        printArray(trades);
+        // Binary search floor & ceiling
+        binaryFloorCeiling(risks, threshold);
 
-        // ---------------- Merge Two Sessions ----------------
-        Trade[] morning = {
-                new Trade("m1", 100),
-                new Trade("m2", 200)
-        };
-
-        Trade[] afternoon = {
-                new Trade("a1", 300),
-                new Trade("a2", 400)
-        };
-
-        Trade[] merged = mergeTwoSorted(morning, afternoon);
-        System.out.println("\nMerged Morning + Afternoon:");
-        printArray(merged);
-
-        // ---------------- Total Volume ----------------
-        int total = totalVolume(merged);
-        System.out.println("\nTotal Volume: " + total);
+        // Binary insertion point
+        findInsertionPoint(risks, threshold);
     }
 }
